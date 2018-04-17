@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-def init_t_e_f(e, f):
+def init_lexicon(e, f):
     t_e_f = defaultdict(lambda: defaultdict(int))
 
     for i in range(len(e)):
