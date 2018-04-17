@@ -1,10 +1,12 @@
 from load_corpus import load_train
+from lexicon import init_t_e_f
 
 ## Load parallel corpus
 [english,french] = load_train('data')
 
-## Create lexicon (double dict)
-# lexicon = create_lexicon(english,french)
-# lexicon[word_e][word_f] = prob
+
+
+## Create uniform t(e|f)
+p_t_e = init_t_e_f(english, french)
 
 ## Estimate translation sentence length
