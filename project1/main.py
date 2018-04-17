@@ -5,14 +5,14 @@
 
 from load_corpus import load_train
 import random
+from lexicon import init_t_e_f
 
 ## Initialization
 # Load parallel corpus
 [e,f] = load_train('data')
 
 # Initialize lexicon with uniform probabilities
-# lexicon = init_lexicon(e,f)
-# lexicon[word_e][word_f] = prob
+lexicon = init_t_e_f(english, french)
 
 # Determine integer in which m must lie
 M = len(max(e,key=len))
