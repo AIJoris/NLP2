@@ -12,6 +12,8 @@ from itertools import permutations, product
 # Load parallel corpus
 print('Loading data...')
 [e,f] = load_train('data')
+e = e[0:1000]
+f = f[0:1000]
 
 # Initialize lexicon with uniform probabilities
 print('Initializing lexicon...')
@@ -32,18 +34,10 @@ while True:
     # Expectation
     print('Expectation...')
     for (e_sent,f_sent) in zip(e,f):
-        # For every sentence and every alignment, compute P(a|e,f)
-        alignments = product(range(0,len(e_sent)),repeat = len(f_sent))
-        for alignment in alignments:
-            likelihood = 1
-            for j, a_j in enumerate(alignment):
-                # Probability of alignment from f_j to e_a_j
-                pi_t = lexicon[e_sent[a_j]][f_sent[j]]
-
-                # Sum of probability of alignment from f_j to each word in e
-                sum_pi_t = sum([lexicon[e_word][f_sent[j]] for e_word in e_sent])
-
-                # Compute ratio between current link and sum of all possible links
+        for j, f_word in enumerate(f_sent):
+            sum_pi_t = sum([lexicon[e_word][f_word] for e_word in e_sent])
+            for a_j, e_word in enumerate(e_sent):
+                pi_t = lexicon[e_word][f_word]
                 ratio = pi_t/float(sum_pi_t)
 
                 # Update counts
