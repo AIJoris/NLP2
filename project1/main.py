@@ -7,6 +7,7 @@ from load_corpus import load_train
 import random
 from lexicon import init_lexicon
 from itertools import permutations, product
+from perplexity import perplexity
 
 ## Initialization
 # Load parallel corpus
@@ -25,7 +26,7 @@ m = random.choice(range(1,M))
 
 ## Expectation Maximization (EM)
 print('Performing EM')
-#TODO add perplexity comparison
+
 while True:
     # Keep track of counts to be used for the M step
     count_f_e = defaultdict(lambda: defaultdict(int)) #[e_word][f_word]
@@ -48,4 +49,7 @@ while True:
     print('Maximization')
     for e_word,f_words in lexicon.items():
         for f_word, prob in f_words.items():
-            lexicon[e_word][f_word] = count_f_e[e_word][f_word]/float(count_e[e_word])
+            lexicon[e_word][f_word] = count_f_e[e_word][f_word] / float(count_e[e_word])
+
+    perplex = perplexity(e,f,lexicon)
+    print(perplex)
