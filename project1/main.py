@@ -16,6 +16,7 @@ print('Loading data...')
 e = e[0:1000]
 f = f[0:1000]
 
+
 # Initialize lexicon with uniform probabilities
 print('Initializing lexicon...')
 lexicon = init_lexicon(e, f)

@@ -7,7 +7,6 @@ def perplexity(e, f, lexicon, eps=1):
             sentence_prob = 1
             for ew in e[i]:
                     sentence_prob *= ( eps / (len(e[i])**len(f[i])))*lexicon[ew][fw]
-
         try:
             perplexity -= math.log(sentence_prob,2)
         # if prob is extremely close to zero, perplexity -= 0. simply skip.
