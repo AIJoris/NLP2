@@ -13,8 +13,8 @@ from perplexity import perplexity
 # Load parallel corpus
 print('Loading data...')
 [e,f] = load_train('data')
-e = e[0:1000]
-f = f[0:1000]
+e = e[0:10000]
+f = f[0:10000]
 
 
 # Initialize lexicon with uniform probabilities
@@ -30,8 +30,8 @@ print('Performing EM')
 
 while True:
     # Keep track of counts to be used for the M step
-    count_f_e = defaultdict(lambda: defaultdict(int)) #[e_word][f_word]
-    count_e = defaultdict(int) #TODO should be count_f?
+    count_f_e = defaultdict(lambda: defaultdict(int))
+    count_f = defaultdict(int)
 
     # Expectation
     print('Expectation...')
@@ -45,12 +45,14 @@ while True:
                 # Update counts
                 count_f_e[e_sent[a_j]][f_sent[j]] += ratio
                 count_e[e_sent[a_j]] += ratio
+                count_f[f_word] += ratio
+
 
     # Maximization
     print('Maximization')
     for e_word,f_words in lexicon.items():
         for f_word, prob in f_words.items():
-            lexicon[e_word][f_word] = count_f_e[e_word][f_word] / float(count_e[e_word])
+            lexicon[e_word][f_word] = count_f_e[e_word][f_word] / float(count_f[f_word])
 
     perplex = perplexity(e,f,lexicon)
     print(perplex)

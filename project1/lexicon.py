@@ -5,7 +5,6 @@ def init_lexicon(e, f):
 
     for i in range(len(e)):
         for ew in e[i]:
-            t_e_f[ew]['NULL'] = 1
             for fw in f[i]:
                 t_e_f[ew][fw] = 1
 

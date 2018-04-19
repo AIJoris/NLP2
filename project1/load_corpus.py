@@ -7,6 +7,6 @@ def load_train(fpath):
         french = [x.split() for x in f.read().splitlines()]
 
 
-    [x.insert(0,"-NULL-") for x in french]
+    [x.insert(0,"-NULL-") for x in english]
 
     return [english,french]
