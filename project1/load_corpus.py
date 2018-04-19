@@ -6,7 +6,5 @@ def load_train(fpath):
     with open(fpath+'/training/hansards.36.2.f','r') as f:
         french = [x.split() for x in f.read().splitlines()]
 
-
     [x.insert(0,"-NULL-") for x in english]
-
     return [english,french]
