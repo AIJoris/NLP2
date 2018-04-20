@@ -16,8 +16,10 @@ from IBM1_EM import IBM1_EM
 # Load parallel corpus
 print('Loading data...')
 [e,f] = load_train('data')
-e = e[0:1000]
-f = f[0:1000]
+
+e = e[0:10000]
+f = f[0:10000]
+
 
 # Initialize lexicon with uniform probabilities
 print('Initializing lexicon...')
