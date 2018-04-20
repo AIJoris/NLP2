@@ -10,7 +10,7 @@ def IBM1_EM(e,f,lexicon,nr_it=10):
     for it in range(nr_it):
         # Keep track of counts to be used for the M step
         count_f_e = defaultdict(lambda: defaultdict(int))
-        count_e = defaultdict(int)
+        count_e = defaultdict(float)
 
         # Expectation
         print('Expectation...')
@@ -39,7 +39,7 @@ def IBM1_EM(e,f,lexicon,nr_it=10):
             # TODO should we skip big/unlikely sentences in this way?
             if sentence_likelihood > 0:
                 perplex -=math.log(sentence_likelihood,2)
-        print('[Iteration 0] perplexity: {}'.format(round(perplex)))
+        print('[Iteration {}] perplexity: {}'.format(it+1, round(perplex)))
         # Maximization
         print('Maximization')
         for e_word, f_words in lexicon.items():

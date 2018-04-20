@@ -13,4 +13,6 @@ def init_lexicon(e, f):
         norm=1.0/len(fwords)
         t_e_f[ew] = {k:v*norm for (k,v) in fwords.items()}
 
+
+
     return t_e_f
