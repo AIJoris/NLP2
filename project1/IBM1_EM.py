@@ -14,7 +14,7 @@ def IBM1_EM(e,f,lexicon,nr_it=10):
 
     # load test set
     count_e, count_f = count_words(e), count_words(f)
-    [e_val,f_val] = load_train('data', 'val')
+    [e_val,f_val] = load_train('data', 'test')
     e_val, f_val = replace_singletons(e_val, count_e), replace_singletons(f_val, count_f)
 
     print('--Performing EM--')
@@ -49,7 +49,8 @@ def IBM1_EM(e,f,lexicon,nr_it=10):
                     count_e[e_sent[a_j]] += ratio
 
             if sentence_likelihood > 0:
-                perplex -=math.log(sentence_likelihood,2)
+                # perplex -=math.log(sentence_likelihood,2)
+                perplex += math.log(sentence_likelihood,2)
         print('[Iteration {}] perplexity: {}'.format(it+1, round(perplex)))
         perplexity_values.append(perplex)
         # Maximization
@@ -58,10 +59,12 @@ def IBM1_EM(e,f,lexicon,nr_it=10):
             for f_word, prob in f_words.items():
                 lexicon[e_word][f_word] = count_f_e[e_word][f_word] / float(count_e[e_word])
 
+
         # Create NAACL file for current run
         output_naacl(viterbi(e_val,f_val,lexicon), 'AER/naacl_IBM1_it{}.txt'.format(it+1))
         # Calculate AER values of current lexicon
-        aer_values.append(cmdline('perl data/testing/eval/wa_eval_align.pl data/validation/dev.wa.nonullalign AER/naacl_IBM1_it{}.txt'.format(it+1)))
+        aer_values.append(cmdline('perl data/testing/eval/wa_eval_align.pl data/testing/answers/test.wa.nonullalign AER/naacl_IBM1_it{}.txt'.format(it+1)))
+
 
     pickle.dump(perplexity_values, open( "perplexity_IBM1.p", "wb" ) )
     pickle.dump(aer_values, open("AER_IBM1.p", "wb"))

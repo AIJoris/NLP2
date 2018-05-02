@@ -21,8 +21,8 @@ import os
 import pickle
 import dill
 
-model = 'IBM1'
-nr_it = 2
+model = 'IBM2'
+nr_it = 15
 max_jump = 50
 savemodel = True
 plots = True
@@ -44,11 +44,8 @@ e, f = replace_singletons(e, count_e), replace_singletons(f, count_f)
 e_test, f_test = replace_singletons(e_test, count_e), replace_singletons(f_test, count_f)
 
 
-# e=e[:50]
-# f=f[:50]
-
-
-# TODO: add log likelihood, ELBO (instead of perplexity)
+e=e[:500]
+f=f[:500]
 
 # Initialize lexicon with uniform probabilities
 print('Initializing lexicon...')
@@ -74,11 +71,9 @@ elif model == 'IBM2':
     q = init_q(e, f, max_jump)
     print('Training IBM 2')
     trained_lexicon, trained_q = IBM2_EM(e,f,lexicon, q, max_jump, nr_it=nr_it)
-    # if savemodel: #TODO save lexicon, q as object
-    #TODO calculate scores
 
     print('calculating final scores...')
-    output_naacl(viterbi(e_test, f_test, lexicon), 'AER/naacl_IBM2.txt')
+    output_naacl(viterbi(e_test, f_test, trained_lexicon, q), 'AER/naacl_IBM2.txt')
     os.system('perl data/testing/eval/wa_check_align.pl AER/naacl_IBM2.txt')
     os.system('perl data/testing/eval/wa_eval_align.pl data/testing/answers/test.wa.nonullalign AER/naacl_IBM2.txt')
 
@@ -86,9 +81,7 @@ elif model == 'IBM2':
         dill.dump(trained_lexicon, open("trained_models/"+model+"_lexicon.dill", "wb" ))
         dill.dump(trained_q, open("trained_models/"+model+"_q.dill", "wb" ))
 
-
-    #TODO: add plot saves in IBM 2
-    # if plots: make_plots('perplexity_IBM2.p', 'AER_IBM2.p')
+    if plots: make_plots('perplexity_IBM2.p', 'AER_IBM2.p')
 
 
 

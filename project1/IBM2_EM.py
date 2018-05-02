@@ -16,7 +16,7 @@ def IBM2_EM(e,f,lexicon,q,max_jump,nr_it=10):
 
     # load test set
     count_e, count_f = count_words(e), count_words(f)
-    [e_val,f_val] = load_train('data', 'val')
+    [e_val,f_val] = load_train('data', 'test')
     e_val, f_val = replace_singletons(e_val, count_e), replace_singletons(f_val, count_f)
 
     print('--Performing EM--')
@@ -40,7 +40,7 @@ def IBM2_EM(e,f,lexicon,q,max_jump,nr_it=10):
             alignment_likelihood = 1
             sentence_likelihood = 1/(len(e_sent)**len(f_sent))
             # sentence_likelihood = 1
-            if sen_i%50 == 0: print('sentence ',sen_i,'/',len(e),', it=',it+1)
+            if sen_i%100 == 0: print('sentence ',sen_i,'/',len(e),', it=',it+1)
             sen_i+=1
             for j, f_word in enumerate(f_sent):
                 # Sum of all alignment link probabilities from current f word to all words in e
@@ -95,7 +95,8 @@ def IBM2_EM(e,f,lexicon,q,max_jump,nr_it=10):
 
 
             if sentence_likelihood > 0:
-                perplex -=math.log(sentence_likelihood,2)
+                # perplex -=math.log(sentence_likelihood,2)
+                perplex += math.log(sentence_likelihood,2)
         print('[Iteration {}] perplexity: {}'.format(it+1, round(perplex)))
         perplexity_values.append(perplex)
 
@@ -112,18 +113,18 @@ def IBM2_EM(e,f,lexicon,q,max_jump,nr_it=10):
                 #Results seem to make sense: diagonal alignments higher probability
 
 
-        # print(q[7])
 
         #TODO: alignment precisely opposite? jump 1 lower prob than jump -1, jump 2 lower prob than jump -2, ...
         # viterbi_IBM2(e,f, lexicon, q)
-
         # Create NAACL file for current run
-    # output_naacl(viterbi(e_val,f_val,lexicon), 'naacl.txt')
+        # output_naacl(viterbi_IBM2(e_val,f_val,lexicon, q), 'AER/naacl_IBM2_it{}.txt'.format(it+1))
+
 
         # Calculate AER values of current lexicon
-        # aer_values.append(cmdline('perl data/testing/eval/wa_eval_align.pl data/testing/answers/test.wa.nonullalign naacl.txt'))
+        # aer_values.append(cmdline('perl data/testing/eval/wa_eval_align.pl data/testing/answers/test.wa.nonullalign AER/naacl_IBM2_it{}.txt'.format(it+1)))
 
-    # pickle.dump(perplexity_values, open( "perplexity_values.p", "wb" ) )
+    pickle.dump(perplexity_values, open( "perplexity_IBM2.p", "wb" ) )
+    pickle.dump(aer_values, open( "AER_IBM2.p", "wb" ) )
     return lexicon, q
 
 
