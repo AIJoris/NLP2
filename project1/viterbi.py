@@ -1,7 +1,8 @@
 from load_corpus import load_train
 from lexicon import init_lexicon
-
-#@TODO Add Sure / Probable (S / P) label after alignment. How?
+import numpy as np
+from collections import defaultdict
+import math
 
 def viterbi(e, f, lexicon):
     print('--Performing Viterbi--')
@@ -23,6 +24,48 @@ def viterbi(e, f, lexicon):
             # the way Pearl script expects output)
             if best_j != 0:
                 alignments.append((str(i+1).zfill(4), best_j, j+1))
+    return alignments
+
+def viterbi_IBM2(e, f, pi, q):
+    alignments = []
+
+    print('--- Performing Viterbi ---   ')
+    for sen_count, (e_sent, f_sent) in enumerate(zip(e,f)):
+        # Initialize V
+        V = np.zeros((len(e_sent), len(f_sent)))
+        trace = defaultdict(int)
+        # Base case
+        for i in range(len(e_sent)):
+            V[i,0] = pi[e_sent[i]][f_sent[0]]
+
+        # Recursive case
+        for j in range(1,len(f_sent)):
+            for i in range(1,len(e_sent)):
+                maximum = 0
+
+                # Loop over previous possible alignments_pred
+                for ii in range(len(e_sent)):
+                    if i-ii != 0 and len(e_sent)-1 > 1:
+                        p = V[ii,j-1] * q[len(e_sent)-1][i-ii] * pi[e_sent[i]][f_sent[j]]
+
+                    # Update p if highest value
+                    if p > maximum:
+                        maximum = p
+                        step = ((i,j),(ii,j-1))
+                        trace[step[0]] = step[1]
+                        V[i,j] = maximum
+
+        # highest probability last column
+        i = np.argmax(V[:,-1])
+        # Last French word alignment
+        alignments.append((str(sen_count).zfill(4), i, len(f_sent)-1))
+        # Backtrack from last French word
+        for j in reversed(range(1,len(f_sent))):
+            prev_pos = trace[(i,j)]
+            alignments.append((str(sen_count).zfill(4), prev_pos[0], prev_pos[1]))
+
+        # print(alignments)
+
     return alignments
 
 def output_naacl(alignments, fn):
