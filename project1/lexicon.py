@@ -1,17 +1,24 @@
 from collections import defaultdict
 
-def init_lexicon(e, f):
+def init_lexicon(e, f,init="random"):
     t_e_f = defaultdict(lambda: defaultdict(float))
 
-    for i in range(len(e)):
-        for ew in e[i]:
-            for fw in f[i]:
-                t_e_f[ew][fw] = 1
+    if init == "random":
+        for i in range(len(e)):
+            for ew in e[i]:
+                for fw in f[i]:
+                    t_e_f[ew][fw] = random.random()
 
-    # Normalize to create uniform distribution
-    for ew,fwords in t_e_f.items():
-        norm=1.0/len(fwords)
-        t_e_f[ew] = {k:v*norm for (k,v) in fwords.items()}
+    else:
+        for i in range(len(e)):
+            for ew in e[i]:
+                for fw in f[i]:
+                    t_e_f[ew][fw] = 1
+
+        # Normalize to create uniform distribution
+        for ew,fwords in t_e_f.items():
+            norm=1.0/len(fwords)
+            t_e_f[ew] = {k:v*norm for (k,v) in fwords.items()}
 
     return t_e_f
 
