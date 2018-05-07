@@ -11,21 +11,24 @@ from load_corpus    import load_train, count_words, replace_singletons
 from lexicon        import init_lexicon, init_q
 from itertools      import permutations, product
 from perplexity     import perplexity
-from viterbi        import viterbi, output_naacl
+from viterbi        import viterbi, viterbi2, output_naacl
 from plots          import make_plots
 from IBM1_EM        import IBM1_EM
 from IBM2_EM        import IBM2_EM
+from IBM1_VB        import IBM1_VB
 import random
 import math
 import os
 import pickle
 import dill
 
-model = 'IBM2'
+model = 'IBM1_VB'
 nr_it = 15
-max_jump = 50
+max_jump = 150
 savemodel = True
 plots = True
+q_init = 'uniform'
+# load_lexicon = 'trained_models/save/IBM1_it15_uniform.dill'
 # modelfn = 'IBM1'
 
 
@@ -44,12 +47,14 @@ e, f = replace_singletons(e, count_e), replace_singletons(f, count_f)
 e_test, f_test = replace_singletons(e_test, count_e), replace_singletons(f_test, count_f)
 
 
-e=e[:500]
-f=f[:500]
 
 # Initialize lexicon with uniform probabilities
 print('Initializing lexicon...')
-lexicon = init_lexicon(e, f)
+
+if load_lexicon == None:
+    lexicon = init_lexicon(e, f)
+else:
+    lexicon = dill.load(open(load_lexicon, "rb" ))
 
 
 # Expectation Maximization
@@ -66,20 +71,29 @@ if model == 'IBM1':
 
     if plots: make_plots('perplexity_IBM1.p', 'AER_IBM1.p')
 
+elif model == 'IBM1_VB':
+    print('Training Bayesian IBM 1')
+    e=e[:100]
+    f=f[:100]
+    trained_lexicon = IBM1_VB(e,f,lexicon,nr_it=nr_it)
+
 elif model == 'IBM2':
     print('Initializing q...')
-    q = init_q(e, f, max_jump)
-    print('Training IBM 2')
-    trained_lexicon, trained_q = IBM2_EM(e,f,lexicon, q, max_jump, nr_it=nr_it)
+    q = init_q(e,f,max_jump,init=q_init)
 
-    print('calculating final scores...')
-    output_naacl(viterbi(e_test, f_test, trained_lexicon, q), 'AER/naacl_IBM2.txt')
-    os.system('perl data/testing/eval/wa_check_align.pl AER/naacl_IBM2.txt')
-    os.system('perl data/testing/eval/wa_eval_align.pl data/testing/answers/test.wa.nonullalign AER/naacl_IBM2.txt')
+    print('Training IBM 2')
+    trained_lexicon, trained_q = IBM2_EM(e,f,q,lexicon, max_jump=max_jump, nr_it=nr_it)
+
+    print('finished training')
 
     if savemodel:
         dill.dump(trained_lexicon, open("trained_models/"+model+"_lexicon.dill", "wb" ))
         dill.dump(trained_q, open("trained_models/"+model+"_q.dill", "wb" ))
+
+    print('calculating final scores...')
+    output_naacl(viterbi2(e_test, f_test, trained_lexicon, q, max_jump), 'AER/naacl_IBM2.txt')
+    os.system('perl data/testing/eval/wa_check_align.pl AER/naacl_IBM2.txt')
+    os.system('perl data/testing/eval/wa_eval_align.pl data/testing/answers/test.wa.nonullalign AER/naacl_IBM2.txt')
 
     if plots: make_plots('perplexity_IBM2.p', 'AER_IBM2.p')
 

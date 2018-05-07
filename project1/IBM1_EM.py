@@ -57,6 +57,7 @@ def IBM1_EM(e,f,lexicon,nr_it=10):
         print('Maximization')
         for e_word, f_words in lexicon.items():
             for f_word, prob in f_words.items():
+                # print(e_word, f_word, count_f_e[e_word][f_word], float(count_e[e_word]))
                 lexicon[e_word][f_word] = count_f_e[e_word][f_word] / float(count_e[e_word])
 
 

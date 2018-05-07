@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 def init_lexicon(e, f):
-    t_e_f = defaultdict(lambda: defaultdict(int))
+    t_e_f = defaultdict(lambda: defaultdict(float))
 
     for i in range(len(e)):
         for ew in e[i]:
@@ -15,20 +15,14 @@ def init_lexicon(e, f):
 
     return t_e_f
 
+import random
 
 def init_q(e,f,max_jump,init='uniform'):
-    q = defaultdict(lambda: defaultdict(float))
+    if init == 'uniform':
+        uniform = 1. / (2 * max_jump)
+        q = {k:v for (k,v) in zip([i for i in range(-max_jump,max_jump+1)], [uniform for i in range(-max_jump,max_jump+1)])}
 
-    for e_sent in e:
-        # skip 0th word since we are interested in previous alignments
-        for i in range(1,len(e_sent)):
-            q[len(e_sent)-1][i] += 1
-            q[len(e_sent)-1][-i] += 1
-
-    # Normalize to create uniform distribution
-    for len_e,pos in q.items():
-        norm=1.0/len(pos)
-        q[len_e] = {k:norm for (k,v) in pos.items()}
-
-    # q index looks like:  [len(e_sent)-1][jump]
+    elif init == 'random':
+        q = {k:v for (k,v) in zip([i for i in range(-max_jump,max_jump+1)], [random.random() for i in range(-max_jump,max_jump+1)])}
+        q = {k:v/sum(q.values()) for (k,v) in q.items()}
     return q
