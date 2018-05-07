@@ -23,12 +23,13 @@ import pickle
 import dill
 
 model = 'IBM1_VB'
-nr_it = 15
+nr_it = 10
 max_jump = 150
 savemodel = True
 plots = True
 q_init = 'uniform'
 # load_lexicon = 'trained_models/save/IBM1_it15_uniform.dill'
+load_lexicon = None
 # modelfn = 'IBM1'
 
 
@@ -73,8 +74,8 @@ if model == 'IBM1':
 
 elif model == 'IBM1_VB':
     print('Training Bayesian IBM 1')
-    e=e[:100]
-    f=f[:100]
+    e=e[:1000]
+    f=f[:1000]
     trained_lexicon = IBM1_VB(e,f,lexicon,nr_it=nr_it)
 
 elif model == 'IBM2':
