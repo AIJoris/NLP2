@@ -8,6 +8,7 @@ def init_lexicon(e, f,init="random"):
             for ew in e[i]:
                 for fw in f[i]:
                     t_e_f[ew][fw] = random.random()
+        print('Theta randomly initialized...')
 
     else:
         for i in range(len(e)):
@@ -20,6 +21,7 @@ def init_lexicon(e, f,init="random"):
             norm=1.0/len(fwords)
             t_e_f[ew] = {k:v*norm for (k,v) in fwords.items()}
 
+        print('Theta uniformly initialized...')
     return t_e_f
 
 import random

@@ -23,7 +23,7 @@ import pickle
 import dill
 
 model = 'IBM1_VB'
-nr_it = 10
+nr_it = 15
 max_jump = 150
 savemodel = True
 plots = True
@@ -38,6 +38,9 @@ load_lexicon = None
 print('Loading data...')
 # Load train data
 [e,f] = load_train('data', 'train')
+e=e[:1000]
+f=f[:1000]
+
 # Find word occurrences for e and f in train data.
 # Update singletons to '-LOW-'
 count_e, count_f = count_words(e), count_words(f)
@@ -47,13 +50,11 @@ e, f = replace_singletons(e, count_e), replace_singletons(f, count_f)
 [e_test,f_test] = load_train('data', 'test')
 e_test, f_test = replace_singletons(e_test, count_e), replace_singletons(f_test, count_f)
 
-
-
 # Initialize lexicon with uniform probabilities
 print('Initializing lexicon...')
 
 if load_lexicon == None:
-    lexicon = init_lexicon(e, f)
+    lexicon = init_lexicon(e, f,init="random")
 else:
     lexicon = dill.load(open(load_lexicon, "rb" ))
 
@@ -74,9 +75,20 @@ if model == 'IBM1':
 
 elif model == 'IBM1_VB':
     print('Training Bayesian IBM 1')
-    e=e[:1000]
-    f=f[:1000]
-    trained_lexicon = IBM1_VB(e,f,lexicon,nr_it=nr_it)
+    trained_lexicon, elbo_values = IBM1_VB(e,f,lexicon,nr_it=nr_it)
+    pickle.dump(file=open('elbo_values.pkl','wb'), obj=elbo_values)
+    print('finished training')
+
+    # Save model
+    if savemodel:
+        dill.dump(trained_lexicon, open("trained_models/IBM1VB_theta.dill", "wb"))
+
+    print('calculating final scores...')
+    output_naacl(viterbi(e_test, f_test, trained_lexicon), 'AER/naacl_IBM1VB.txt')
+    os.system('perl data/testing/eval/wa_check_align.pl AER/naacl_IBM1VB.txt')
+    os.system('perl data/testing/eval/wa_eval_align.pl data/testing/answers/test.wa.nonullalign AER/naacl_IBM1VB.txt')
+
+    # if plots: make_plots('perplexity_IBM1VB.p', 'AER_IBM1VB.p')
 
 elif model == 'IBM2':
     print('Initializing q...')
