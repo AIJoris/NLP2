@@ -50,7 +50,7 @@ def IBM1_VB(e,f,Lambda,nr_it=10,alpha=0.01):
 
         #TODO: calculate ELBO
         elbo = calculate_elbo(e,f,count_e,count_f,theta,alpha)
-        print('ELBO:',elbo)
+        print('ELBO:',elbow)
         elbo_values.append(elbo)
 
         # Create NAACL file for current run
